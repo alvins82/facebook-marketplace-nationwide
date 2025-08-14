@@ -39,6 +39,9 @@ export default function Search() {
     itemConditionInitialState[key] = false
   })
   const [itemCondition, setItemCondition] = useState(itemConditionInitialState)
+  const [searchType, setSearchType] = useState("normal")
+  const [vehicleMake, setVehicleMake] = useState("")
+  const [vehicleModel, setVehicleModel] = useState("")
 
   const device = useDeviceDetection()
 
@@ -91,7 +94,6 @@ export default function Search() {
   }
 
   const doSearch = useCallback(() => {
-    if (searchTerm.trim() === "") return
     let citiesFb = countriesData[country].cities_fb
     let locale: string = countriesData[country].locale
     let jobQueue: TimedQueue = new TimedQueue()
@@ -101,6 +103,18 @@ export default function Search() {
       let searchURL = siteConfig.templateURL[locale as keyof typeof siteConfig.templateURL]
         .replace('|CITY|', city)
         .replace('|STRING|', searchTerm)
+
+      if (searchType === "vehicle") {
+        searchURL = searchURL.replace('|SEARCHTYPE|', 'vehicles')
+        searchURL += '&make=' + vehicleMake
+        if (vehicleModel) {
+          searchURL += '&model=' + vehicleModel
+        }
+      } else {
+        searchURL = searchURL.replace('|SEARCHTYPE|', 'search')
+        if (sortBy!==siteConfig.filters.defaultSortBy)
+          searchURL += '&sortBy=' + sortBy
+      }
 
       if (!!minPrice) searchURL += '&minPrice=' + minPrice
       if (!!maxPrice) searchURL += '&maxPrice=' + maxPrice
@@ -170,7 +184,7 @@ export default function Search() {
     // @ts-ignore umami is defined in the global scope via the umami script
     window.umami.track(`search_${country}`, { searchTerm: searchTerm })
     
-  }, [device, searchTerm, country, countriesData, sortBy, itemCondition, availability, daysSinceListed, minPrice, maxPrice, deliveryMethod, searchThrottle])
+  }, [device, searchTerm, country, countriesData, sortBy, itemCondition, availability, daysSinceListed, minPrice, maxPrice, deliveryMethod, searchThrottle, searchType, vehicleMake, vehicleModel])
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -242,6 +256,53 @@ export default function Search() {
           <Button className="my-0 ml-8 cursor-pointer px-8 uppercase" onClick={doSearch}>Search</Button>
         </div>
         <div className="fontSans mt-4 flex flex-row flex-wrap">
+          <label className="mb-1 w-full text-xs sm:mb-4 sm:w-1/4">
+            <div className="m-1 rounded bg-primary/5 p-2">
+              Search Type &nbsp;
+              <Select name="search_type" onValueChange={setSearchType} defaultValue="normal">
+                <SelectTrigger className="mt-1 cursor-pointer bg-transparent p-0 text-primary">
+                  <SelectValue placeholder="Search Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">Normal Search</SelectItem>
+                  <SelectItem value="vehicle">Vehicle Search</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </label>
+          {searchType === "vehicle" && (
+            <>
+              <label className="mb-1 w-full text-xs sm:mb-4 sm:w-1/4">
+                <div className="m-1 rounded bg-primary/5 p-2">
+                  Make &nbsp;
+                  <Select name="vehicle_make" onValueChange={setVehicleMake} defaultValue="">
+                    <SelectTrigger className="mt-1 cursor-pointer bg-transparent p-0 text-primary">
+                      <SelectValue placeholder="Select Make" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="264916861051142">Land Rover</SelectItem>
+                      <SelectItem value="2571870739551112">Suburu</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </label>
+              <label className="mb-1 w-full text-xs sm:mb-4 sm:w-1/4">
+                <div className="m-1 rounded bg-primary/5 p-2">
+                  Model &nbsp;
+                  <Select name="vehicle_model" onValueChange={setVehicleModel} defaultValue="">
+                    <SelectTrigger className="mt-1 cursor-pointer bg-transparent p-0 text-primary">
+                      <SelectValue placeholder="Select Model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="418411295587634">Discovery</SelectItem>
+                      <SelectItem value="842113459469681">Range Rover</SelectItem>
+                      <SelectItem value="2208683129448203">WRX</SelectItem>                      
+                    </SelectContent>
+                  </Select>
+                </div>
+              </label>
+            </>
+          )}
           <label className="mb-1 w-full text-xs sm:mb-4 sm:w-1/4">
             <div className="m-1 rounded bg-primary/5 p-2">
                 Sort By &nbsp;

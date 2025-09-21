@@ -42,6 +42,7 @@ export default function Search() {
   const [searchType, setSearchType] = useState("normal")
   const [vehicleMake, setVehicleMake] = useState("")
   const [vehicleModel, setVehicleModel] = useState("")
+  const [category, setCategory] = useState("all")
 
   const device = useDeviceDetection()
 
@@ -136,6 +137,9 @@ export default function Search() {
       if (daysSinceListed!==siteConfig.filters.defaultDaysSinceListed)
         searchURL += '&daysSinceListed=' + daysSinceListed
 
+      if (category !== "all")
+        searchURL += '&category_id=' + category
+
 
       if (device !== "Mobile") {
         if (searchThrottle) {
@@ -184,7 +188,7 @@ export default function Search() {
     // @ts-ignore umami is defined in the global scope via the umami script
     window.umami.track(`search_${country}`, { searchTerm: searchTerm })
     
-  }, [device, searchTerm, country, countriesData, sortBy, itemCondition, availability, daysSinceListed, minPrice, maxPrice, deliveryMethod, searchThrottle, searchType, vehicleMake, vehicleModel])
+  }, [device, searchTerm, country, countriesData, sortBy, itemCondition, availability, daysSinceListed, minPrice, maxPrice, deliveryMethod, searchThrottle, searchType, vehicleMake, vehicleModel, category])
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -266,6 +270,20 @@ export default function Search() {
                 <SelectContent>
                   <SelectItem value="normal">Normal Search</SelectItem>
                   <SelectItem value="vehicle">Vehicle Search</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </label>
+          <label className="mb-1 w-full text-xs sm:mb-4 sm:w-1/4">
+            <div className="m-1 rounded bg-primary/5 p-2">
+              Category &nbsp;
+              <Select name="category" onValueChange={setCategory} defaultValue="all">
+                <SelectTrigger className="mt-1 cursor-pointer bg-transparent p-0 text-primary">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="479353692612078">Electronics</SelectItem>
                 </SelectContent>
               </Select>
             </div>

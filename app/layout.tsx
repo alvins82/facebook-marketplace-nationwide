@@ -7,7 +7,6 @@ import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import { SiteHeader } from "@/components/site-header"
 import { ThemeProvider } from "@/components/theme-provider"
-import Script from "next/script"
 import dotenv from "dotenv"
 
 dotenv.config()
@@ -63,11 +62,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <html lang="en" suppressHydrationWarning>
         <head>
           <title>{siteConfig.name}</title>
-          <Script
-            defer
-            src={process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL}
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-        ></Script>
         </head>
         <body
           className={cn(

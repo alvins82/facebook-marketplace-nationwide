@@ -180,11 +180,13 @@ export default function Search() {
 
     if (searchThrottle) jobQueue.start()
 
-    ReactGA.event({
-      category: "search",
-      action: `search_${country}`,
-      label: searchTerm
-    })
+    try {
+      ReactGA.event({
+        category: "search",
+        action: `search_${country}`,
+        label: searchTerm
+      })
+    } catch (_) {}
   }, [device, searchTerm, country, countriesData, sortBy, itemCondition, availability, daysSinceListed, minPrice, maxPrice, deliveryMethod, searchThrottle, searchType, vehicleMake, vehicleModel, category])
 
   const handleKeyPress = useCallback(
